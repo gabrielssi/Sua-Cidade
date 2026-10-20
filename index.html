@@ -99,9 +99,9 @@
             </a>
 
             <div class="flex items-center gap-3 sm:gap-4">
-                <div class="hidden lg:flex items-center gap-2 text-xs font-bold bg-navy-MEDIUM px-3.5 py-2 rounded-xl border border-navy-SURFACE text-slate-200">
+                <div id="locationStatusTag" class="hidden lg:flex items-center gap-2 text-xs font-bold bg-navy-MEDIUM px-3.5 py-2 rounded-xl border border-navy-SURFACE text-slate-200">
                     <span class="w-2.5 h-2.5 rounded-full bg-mint-DEFAULT animate-pulse"></span>
-                    <span>Auditoria IBGE & OMS</span>
+                    <span id="locationStatusText">Localização Automática</span>
                 </div>
 
                 <button onclick="window.print()" class="no-print bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white border border-navy-SURFACE px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm">
@@ -122,14 +122,14 @@
             </h1>
             
             <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto font-medium">
-                Chega de porcentagens soltas. Veja a quantidade real de habitantes atendidos, a infraestrutura da região e o custo de vida em Reais (R$).
+                Consulte o município e veja a quantidade real de habitantes atendidos, a infraestrutura local e o custo de vida em Reais (R$).
             </p>
 
             <!-- SEARCH BAR -->
             <div class="search-section max-w-2xl mx-auto pt-2 relative">
                 <div class="search-input-wrapper flex items-center bg-white rounded-2xl p-2 border-2 border-transparent shadow-2xl mint-glow-focus transition-all">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 text-lg ml-3 mr-2"></i>
-                    <input type="text" id="cityInput" placeholder="Digite o município (ex: Cocal do Sul, São Paulo, Curitiba)..." 
+                    <input type="text" id="cityInput" placeholder="Digite o município (ex: São Paulo, Curitiba, Cocal do Sul)..." 
                            class="w-full bg-transparent border-none outline-none text-navy-DEEP font-bold text-base placeholder-slate-400 px-2" autocomplete="off">
                     
                     <button id="clearSearchBtn" class="text-slate-400 hover:text-coral-DEFAULT px-3 hidden transition-colors" title="Limpar">
@@ -146,10 +146,10 @@
 
             <!-- QUICK CHIPS -->
             <div class="flex flex-wrap items-center justify-center gap-2 text-xs pt-2">
-                <span class="text-slate-400 font-bold mr-1"><i class="fa-solid fa-location-crosshairs text-coral-DEFAULT mr-1"></i> Cidades de Exemplo:</span>
-                <button onclick="selectCityQuick('4204251', 'Cocal do Sul', 'SC')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Cocal do Sul - SC</button>
+                <span class="text-slate-400 font-bold mr-1"><i class="fa-solid fa-location-crosshairs text-coral-DEFAULT mr-1"></i> Acesso Rápido:</span>
                 <button onclick="selectCityQuick('3550308', 'São Paulo', 'SP')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">São Paulo - SP</button>
                 <button onclick="selectCityQuick('4106902', 'Curitiba', 'PR')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Curitiba - PR</button>
+                <button onclick="selectCityQuick('4204251', 'Cocal do Sul', 'SC')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Cocal do Sul - SC</button>
                 <button onclick="selectCityQuick('2611606', 'Recife', 'PE')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Recife - PE</button>
             </div>
         </div>
@@ -161,8 +161,8 @@
         <!-- LOADING SPINNER -->
         <div id="loadingSpinner" class="hidden bg-white border border-borderSubtle rounded-2xl p-12 text-center shadow-descomplica space-y-4">
             <div class="w-12 h-12 border-4 border-mint-LIGHT border-t-mint-DEFAULT rounded-full animate-spin mx-auto"></div>
-            <p class="text-navy-DEEP font-black text-base">Processando e contextualizando estatísticas do município...</p>
-            <p class="text-mutedText text-xs font-medium">Extraindo microdados do IBGE Censo, PNUD e Open-Meteo</p>
+            <p id="spinnerText" class="text-navy-DEEP font-black text-base">Identificando sua localização e extraindo estatísticas...</p>
+            <p class="text-mutedText text-xs font-medium">Extraindo dados oficiais do IBGE, PNUD e Open-Meteo</p>
         </div>
 
         <!-- DASHBOARD CONTENT -->
@@ -174,10 +174,10 @@
 
                 <div class="space-y-4 pl-2 flex-1">
                     <div class="flex flex-wrap items-center gap-3">
-                        <h2 id="cityNameDisplay" class="text-3xl sm:text-4xl font-black text-navy-DEEP tracking-tight">Cocal do Sul</h2>
+                        <h2 id="cityNameDisplay" class="text-3xl sm:text-4xl font-black text-navy-DEEP tracking-tight">São Paulo</h2>
                         
                         <span id="stateBadgeDisplay" class="bg-mint-DEFAULT text-navy-DEEP font-black text-sm px-4 py-1 rounded-full uppercase tracking-widest shadow-sm">
-                            SC
+                            SP
                         </span>
 
                         <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-lg border border-emerald-200">
@@ -207,11 +207,17 @@
                     </div>
                 </div>
 
-                <div class="bg-navy-DEEP px-6 py-5 rounded-2xl flex flex-col justify-center min-w-[260px] self-start md:self-auto shadow-lg border border-navy-LIGHT">
-                    <div class="text-[11px] uppercase font-extrabold text-mint-DEFAULT tracking-wider">Avaliação de Infraestrutura</div>
-                    <div id="overallScoreBadge" class="text-xl font-black text-white mt-1">Avaliando...</div>
-                    <div class="text-xs text-slate-300 font-semibold mt-1.5 flex items-center gap-1.5">
-                        <i class="fa-solid fa-shield-halved text-mint-DEFAULT"></i> Critérios OMS & PNUD
+                <!-- CARTÃO DE AVALIAÇÃO COM ÍCONE COMPATÍVEL GARANTIDO -->
+                <div class="bg-navy-DEEP p-5 rounded-2xl flex items-center gap-4 min-w-[280px] self-start md:self-auto shadow-lg border border-navy-LIGHT">
+                    <div class="w-12 h-12 rounded-xl bg-navy-MEDIUM border border-navy-SURFACE flex items-center justify-center shrink-0 shadow-inner">
+                        <i class="fa-solid fa-chart-pie text-mint-DEFAULT text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] uppercase font-extrabold text-mint-DEFAULT tracking-wider">Avaliação de Infraestrutura</div>
+                        <div id="overallScoreBadge" class="text-lg font-black text-white mt-0.5">Avaliando...</div>
+                        <div class="text-xs text-slate-300 font-semibold mt-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-mint-DEFAULT"></i> Critérios OMS & PNUD
+                        </div>
                     </div>
                 </div>
             </section>
@@ -230,7 +236,6 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     
-                    <!-- DADO ABSOLUTO DE ATENDIDOS -->
                     <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-2">
                         <div class="text-xs font-black uppercase text-emerald-800 tracking-wider flex items-center justify-between">
                             <span><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> População Atendida</span>
@@ -240,7 +245,6 @@
                         <p class="text-xs text-emerald-800 font-semibold">Moradores com rede de esgoto ou fossa séptica adequada.</p>
                     </div>
 
-                    <!-- DADO ABSOLUTO DE NÃO ATENDIDOS -->
                     <div class="bg-rose-50/80 border border-rose-200 rounded-2xl p-5 space-y-2">
                         <div class="text-xs font-black uppercase text-rose-800 tracking-wider flex items-center justify-between">
                             <span><i class="fa-solid fa-circle-xmark mr-1 text-rose-600"></i> População Desassistida</span>
@@ -250,7 +254,6 @@
                         <p class="text-xs text-rose-800 font-semibold">Moradores com esgoto a céu aberto, fossa rudimentar ou sem vala.</p>
                     </div>
 
-                    <!-- EXPLICAÇÃO E CONTEXTO TÉCNICO -->
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-5 space-y-2 flex flex-col justify-between">
                         <div>
                             <div class="text-xs font-black uppercase text-navy-DEEP tracking-wider mb-1"><i class="fa-solid fa-circle-info mr-1 text-blue-600"></i> Contexto da Meta de Saneamento</div>
@@ -280,7 +283,6 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 
-                    <!-- RENDA MÉDIA REAL -->
                     <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between text-emerald-800 text-xs font-black uppercase tracking-wider">
                             <span><i class="fa-solid fa-money-bill-wave mr-1"></i> Renda Média</span>
@@ -290,7 +292,6 @@
                         <p id="costSalarySM" class="text-[11px] text-emerald-700 font-semibold">-- salários mínimos</p>
                     </div>
 
-                    <!-- ALIMENTAÇÃO / MERCADO -->
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between text-slate-600 text-xs font-extrabold uppercase tracking-wider">
                             <span><i class="fa-solid fa-cart-shopping text-navy-DEEP mr-1"></i> Alimentação</span>
@@ -299,7 +300,6 @@
                         <p class="text-[11px] text-mutedText">Cesta básica + mercado local</p>
                     </div>
 
-                    <!-- ÁGUA & ESGOTO -->
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between text-slate-600 text-xs font-extrabold uppercase tracking-wider">
                             <span><i class="fa-solid fa-droplet text-blue-600 mr-1"></i> Água & Esgoto</span>
@@ -308,7 +308,6 @@
                         <p class="text-[11px] text-mutedText">Tarifa básica residencial</p>
                     </div>
 
-                    <!-- LUZ / ENERGIA -->
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between text-slate-600 text-xs font-extrabold uppercase tracking-wider">
                             <span><i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Luz / Energia</span>
@@ -317,7 +316,6 @@
                         <p class="text-[11px] text-mutedText">Consumo médio domiciliar</p>
                     </div>
 
-                    <!-- LAZER & DELIVERY -->
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between text-slate-600 text-xs font-extrabold uppercase tracking-wider">
                             <span><i class="fa-solid fa-utensils text-coral-DEFAULT mr-1"></i> Lazer / Delivery</span>
@@ -328,7 +326,6 @@
 
                 </div>
 
-                <!-- BALANÇO DO CUSTO DE VIDA -->
                 <div class="bg-navy-DEEP text-white rounded-2xl p-5 border border-navy-LIGHT flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="space-y-1 text-center sm:text-left">
                         <div class="text-xs text-mint-DEFAULT font-extrabold uppercase tracking-wider">Resumo do Custo de Vida Básico</div>
@@ -383,7 +380,7 @@
             <!-- 5. PAINEL DE DETALHAMENTO COM CONTEXTO TÉCNICO -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                <!-- QUALIDADE DO AR (REGRA OMS + EXPLICAÇÃO) -->
+                <!-- QUALIDADE DO AR -->
                 <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
@@ -423,7 +420,7 @@
                     </div>
                 </div>
 
-                <!-- IDH & EDUCAÇÃO (CORREÇÃO DE BUG + EXPLICAÇÃO) -->
+                <!-- IDH & EDUCAÇÃO -->
                 <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
@@ -546,7 +543,6 @@
                 console.error("Erro ao carregar mapa de municípios:", e);
             }
         }
-        loadCities();
 
         cityInput.addEventListener('input', () => {
             const query = cityInput.value.trim().toLowerCase();
@@ -586,7 +582,7 @@
             const val = cityInput.value.trim().split('-')[0].trim();
             const match = allCitiesCache.find(c => c.nome.toLowerCase() === val.toLowerCase());
             if (match) selectCityQuick(match.id, match.nome, match.uf);
-            else selectCityQuick('4204251', 'Cocal do Sul', 'SC');
+            else selectCityQuick('3550308', 'São Paulo', 'SP');
         });
 
         window.selectCityQuick = function(id, nome, uf) {
@@ -725,7 +721,7 @@
             
             try {
                 let population = null;
-                let lat = -28.601, lon = -49.324;
+                let lat = -23.550, lon = -46.633; // Default SP Coords
                 let elevation = "N/D";
 
                 try {
@@ -750,11 +746,11 @@
                     fetchIbgeIndicator(29167, ibgeId)
                 ]);
 
-                const totalPop = population || 18295; // Fallback se offline
+                const totalPop = population || 11451245; // Fallback SP
                 const popFormatted = totalPop.toLocaleString('pt-BR');
                 setElemHTML('heroPopulationVal', `${popFormatted} <span class="text-base font-bold text-mutedText">habitantes</span>`);
 
-                // 1. SANEAMENTO BÁSICO REAL E CONTEXTUALIZADO
+                // SANEAMENTO BÁSICO
                 let servedPop = 0;
                 let unservedPop = 0;
                 let sanitationPct = 0;
@@ -768,8 +764,7 @@
                         servedPop = Math.round((sanitationPct / 100) * totalPop);
                     }
                 } else {
-                    // Cocal do Sul por padrão tem alta cobertura no Censo
-                    sanitationPct = 98.2;
+                    sanitationPct = 96.5;
                     servedPop = Math.round((sanitationPct / 100) * totalPop);
                 }
 
@@ -790,8 +785,8 @@
                     setElemText('sanitationContextText', `${sanitationPct.toFixed(1)}% de saneamento significa que ${servedPop.toLocaleString('pt-BR')} habitantes têm esgotamento sanitário adequado, enquanto ${unservedPop.toLocaleString('pt-BR')} moradores (${unservedPct}%) ainda convivem com fossa rudimentar ou descarte inadequado.`);
                 }
 
-                // 2. CORREÇÃO DO BUG DA ESCOLARIZAÇÃO (> 100%)
-                let rawSchooling = schooling.value !== null ? schooling.value : 98.5;
+                // ESCOLARIZAÇÃO
+                let rawSchooling = schooling.value !== null ? schooling.value : 98.2;
                 let realSchoolingPct = Math.min(100, rawSchooling);
 
                 setElemText('schoolingVal', `${realSchoolingPct.toFixed(1)}%`);
@@ -801,16 +796,16 @@
                     setElemText('schoolingContextText', `Indica a porcentagem oficial de crianças de 6 a 14 anos com matrícula ativa frequentando o ensino fundamental na rede de ensino.`);
                 }
 
-                // 3. RESOLUÇÃO DO IDHM (-- SEM DADOS)
-                let idhmVal = idhm.value !== null ? idhm.value : 0.768; // Censo IDHM oficial de referência
+                // IDHM
+                let idhmVal = idhm.value !== null ? idhm.value : 0.805;
                 setElemText('idhmVal', idhmVal.toFixed(3));
                 setElemHTML('idhmBadge', getStatusBadge('idhm', idhmVal));
-                setElemText('idhmContextNote', `Índice de Desenvolvimento Humano Municipal apurado pelo PNUD/ONU (Faixa de desenvolvimento elevado).`);
+                setElemText('idhmContextNote', `Índice de Desenvolvimento Humano Municipal apurado pelo PNUD/ONU (Faixa de desenvolvimento muito elevado).`);
 
-                // 4. CUSTO DE VIDA & RENDA REAL EM R$
+                // CUSTO DE VIDA & RENDA REAL
                 const costObj = calculateCostOfLiving(stateUF, totalPop, salary.value);
                 setElemText('costSalary', costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
-                setElemText('costSalarySM', `${salary.value ? salary.value.toFixed(1) : '2.1'} salários mínimos (R$ 1.621,00)`);
+                setElemText('costSalarySM', `${salary.value ? salary.value.toFixed(1) : '3.2'} salários mínimos (R$ 1.621,00)`);
                 setElemText('costFood', costObj.alimentacao.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
                 setElemText('costWater', costObj.agua.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
                 setElemText('costEnergy', costObj.luz.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
@@ -821,22 +816,22 @@
                 const compromiseBadgeClass = costObj.comprometimento > 75 ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300';
                 setElemHTML('costCompromiseBadge', `<span class="${compromiseBadgeClass} border text-xs font-black px-3 py-1.5 rounded-xl"><i class="fa-solid fa-chart-pie mr-1"></i> ${costObj.comprometimento}% Renda Consumida</span>`);
 
-                // Economia & PIB
-                setElemText('pibVal', pib.value !== null ? pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : "R$ 48.210,00");
-                setElemHTML('pibBadge', getStatusBadge('pib', pib.value || 48210));
+                // Economia
+                setElemText('pibVal', pib.value !== null ? pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : "R$ 62.850,00");
+                setElemHTML('pibBadge', getStatusBadge('pib', pib.value || 62850));
 
-                setElemText('salaryVal', salary.value !== null ? `${salary.value.toFixed(1)} s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})` : `2.1 s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})`);
+                setElemText('salaryVal', salary.value !== null ? `${salary.value.toFixed(1)} s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})` : `3.2 s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})`);
 
                 // Geografia & Mapa
-                const areaFormatted = area.value !== null ? `${area.value.toLocaleString('pt-BR')} km²` : "117 km²";
+                const areaFormatted = area.value !== null ? `${area.value.toLocaleString('pt-BR')} km²` : "1.521 km²";
                 setElemText('areaVal', areaFormatted);
 
-                const areaNum = area.value || 117;
+                const areaNum = area.value || 1521;
                 const density = (totalPop / areaNum).toFixed(1);
                 setElemText('densityVal', `${density} hab/km²`);
                 setElemHTML('densityBadge', `<span class="bg-navy-MEDIUM text-slate-200 border border-navy-SURFACE text-xs font-bold px-3 py-1 rounded-xl"><i class="fa-solid fa-chart-area text-mint-DEFAULT mr-1"></i> ${density} hab/km²</span>`);
 
-                // Clima e Qualidade do Ar (Open-Meteo)
+                // Clima e Qualidade do Ar
                 try {
                     const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=pt&format=json`);
                     const geoData = await geoRes.json();
@@ -858,8 +853,8 @@
                     if (airData.current) {
                         const pm25 = airData.current.pm2_5;
                         const pm10 = airData.current.pm10;
-                        setElemText('pm25Val', pm25 !== undefined ? `${pm25.toFixed(1)} µg/m³` : "11.2 µg/m³");
-                        setElemText('pm10Val', pm10 !== undefined ? `${pm10.toFixed(1)} µg/m³` : "14.8 µg/m³");
+                        setElemText('pm25Val', pm25 !== undefined ? `${pm25.toFixed(1)} µg/m³` : "18.5 µg/m³");
+                        setElemText('pm10Val', pm10 !== undefined ? `${pm10.toFixed(1)} µg/m³` : "28.2 µg/m³");
                         
                         const airEval = evaluateAirOMS(pm25, pm10);
                         setElemHTML('airStatus', airEval.badge);
@@ -887,8 +882,51 @@
             }
         }
 
-        // INIT Default - Cocal do Sul / SC
-        fetchDashboardData('4204251', 'Cocal do Sul', 'SC');
+        // INICIALIZAÇÃO COM GEOLOCALIZAÇÃO AUTOMÁTICA
+        async function initDashboardWithGeolocation() {
+            await loadCities();
+
+            if ("geolocation" in navigator) {
+                setElemText('spinnerText', "Obtendo sua localização para carregar sua cidade...");
+                loadingSpinner.classList.remove('hidden');
+
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        try {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+                            const data = await res.json();
+                            
+                            const detectedCity = data.address?.city || data.address?.town || data.address?.municipality;
+                            
+                            if (detectedCity && allCitiesCache.length > 0) {
+                                const match = allCitiesCache.find(c => c.nome.toLowerCase() === detectedCity.toLowerCase());
+                                if (match) {
+                                    setElemText('locationStatusText', `${match.nome} - ${match.uf}`);
+                                    selectCityQuick(match.id, match.nome, match.uf);
+                                    return;
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Geocodificação reversa falhou, utilizando cidade padrão.", e);
+                        }
+                        // Fallback São Paulo
+                        selectCityQuick('3550308', 'São Paulo', 'SP');
+                    },
+                    (error) => {
+                        console.warn("Permissão de localização negada ou indisponível.", error);
+                        selectCityQuick('3550308', 'São Paulo', 'SP');
+                    },
+                    { timeout: 6000 }
+                );
+            } else {
+                selectCityQuick('3550308', 'São Paulo', 'SP');
+            }
+        }
+
+        initDashboardWithGeolocation();
     </script>
 </body>
 </html>
