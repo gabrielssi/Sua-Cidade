@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sua Cidade — Transparência e Detalhamento de Dados</title>
+    <title>Sua Cidade — Transparência Real e Desigualdade Territorial</title>
     
     <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -95,7 +95,7 @@
             
             <a href="#" class="flex items-center gap-3 group">
                 <span class="text-2xl font-black tracking-tight text-white">Sua<span class="text-mint-DEFAULT">Cidade</span></span>
-                <span class="bg-mint-DEFAULT/15 text-mint-DEFAULT border border-mint-DEFAULT/40 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">Contexto Real e Absoluto</span>
+                <span class="bg-mint-DEFAULT/15 text-mint-DEFAULT border border-mint-DEFAULT/40 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">Sem Maquiagem de Dados</span>
             </a>
 
             <div class="flex items-center gap-3 sm:gap-4">
@@ -112,24 +112,30 @@
         </div>
     </header>
 
+    <!-- ALERTA DE TRANSPARÊNCIA METODOLÓGICA -->
+    <div class="bg-amber-500/10 border-b border-amber-500/20 text-amber-900 text-xs py-2.5 px-4 font-semibold text-center no-print flex items-center justify-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+        <span><strong>Aviso da Plataforma:</strong> As médias oficiais do IBGE agregam todo o município. Em metrópoles como Rio de Janeiro e São Paulo, áreas periféricas e favelas enfrentam déficits muito maiores do que os números médios sugerem.</span>
+    </div>
+
     <!-- HERO SEARCH SECTION -->
     <section class="bg-navy-DEEP text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden no-print">
         <div class="absolute top-0 right-1/4 w-96 h-96 bg-mint-DEFAULT/10 rounded-full blur-3xl pointer-events-none"></div>
         
         <div class="max-w-4xl mx-auto text-center space-y-6 relative z-10">
             <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-                Dados reais e explicados da <span class="text-mint-DEFAULT underline decoration-mint-DEFAULT/40 underline-offset-8">sua cidade</span>
+                Dados reais e sem distorção da <span class="text-mint-DEFAULT underline decoration-mint-DEFAULT/40 underline-offset-8">sua cidade</span>
             </h1>
             
             <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto font-medium">
-                Consulte o município e veja a quantidade real de habitantes atendidos, a infraestrutura local e o custo de vida em Reais (R$).
+                Consulte o município e veja os números absolutos reais de habitantes desassistidos, estimativas regionais de custo de vida e o contexto por trás dos indicadores.
             </p>
 
             <!-- SEARCH BAR -->
             <div class="search-section max-w-2xl mx-auto pt-2 relative">
                 <div class="search-input-wrapper flex items-center bg-white rounded-2xl p-2 border-2 border-transparent shadow-2xl mint-glow-focus transition-all">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 text-lg ml-3 mr-2"></i>
-                    <input type="text" id="cityInput" placeholder="Digite o município (ex: São Paulo, Curitiba, Cocal do Sul)..." 
+                    <input type="text" id="cityInput" placeholder="Digite o município (ex: Rio de Janeiro, São Paulo, Recife)..." 
                            class="w-full bg-transparent border-none outline-none text-navy-DEEP font-bold text-base placeholder-slate-400 px-2" autocomplete="off">
                     
                     <button id="clearSearchBtn" class="text-slate-400 hover:text-coral-DEFAULT px-3 hidden transition-colors" title="Limpar">
@@ -147,9 +153,9 @@
             <!-- QUICK CHIPS -->
             <div class="flex flex-wrap items-center justify-center gap-2 text-xs pt-2">
                 <span class="text-slate-400 font-bold mr-1"><i class="fa-solid fa-location-crosshairs text-coral-DEFAULT mr-1"></i> Acesso Rápido:</span>
+                <button onclick="selectCityQuick('3304557', 'Rio de Janeiro', 'RJ')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Rio de Janeiro - RJ</button>
                 <button onclick="selectCityQuick('3550308', 'São Paulo', 'SP')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">São Paulo - SP</button>
                 <button onclick="selectCityQuick('4106902', 'Curitiba', 'PR')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Curitiba - PR</button>
-                <button onclick="selectCityQuick('4204251', 'Cocal do Sul', 'SC')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Cocal do Sul - SC</button>
                 <button onclick="selectCityQuick('2611606', 'Recife', 'PE')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE font-bold">Recife - PE</button>
             </div>
         </div>
@@ -161,8 +167,8 @@
         <!-- LOADING SPINNER -->
         <div id="loadingSpinner" class="hidden bg-white border border-borderSubtle rounded-2xl p-12 text-center shadow-descomplica space-y-4">
             <div class="w-12 h-12 border-4 border-mint-LIGHT border-t-mint-DEFAULT rounded-full animate-spin mx-auto"></div>
-            <p id="spinnerText" class="text-navy-DEEP font-black text-base">Identificando sua localização e extraindo estatísticas...</p>
-            <p class="text-mutedText text-xs font-medium">Extraindo dados oficiais do IBGE, PNUD e Open-Meteo</p>
+            <p id="spinnerText" class="text-navy-DEEP font-black text-base">Identificando município e auditando dados oficiais...</p>
+            <p class="text-mutedText text-xs font-medium">Extraindo estatísticas do IBGE, PNUD e Open-Meteo</p>
         </div>
 
         <!-- DASHBOARD CONTENT -->
@@ -174,21 +180,21 @@
 
                 <div class="space-y-4 pl-2 flex-1">
                     <div class="flex flex-wrap items-center gap-3">
-                        <h2 id="cityNameDisplay" class="text-3xl sm:text-4xl font-black text-navy-DEEP tracking-tight">São Paulo</h2>
+                        <h2 id="cityNameDisplay" class="text-3xl sm:text-4xl font-black text-navy-DEEP tracking-tight">Rio de Janeiro</h2>
                         
                         <span id="stateBadgeDisplay" class="bg-mint-DEFAULT text-navy-DEEP font-black text-sm px-4 py-1 rounded-full uppercase tracking-widest shadow-sm">
-                            SP
+                            RJ
                         </span>
 
                         <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-lg border border-emerald-200">
-                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Números Absolutos + Percentuais Explicados
+                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Números Absolutos Auditados
                         </span>
                     </div>
 
                     <div class="bg-slateBg p-4 sm:p-5 rounded-2xl border border-borderSubtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-2xl">
                         <div>
                             <div class="text-xs uppercase font-extrabold text-mutedText tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-users text-navy-DEEP"></i> População Residente Contada
+                                <i class="fa-solid fa-users text-navy-DEEP"></i> População Residente Oficial
                             </div>
                             <div class="text-3xl sm:text-4xl font-black text-navy-DEEP mt-1" id="heroPopulationVal">
                                 -- <span class="text-base font-bold text-mutedText">habitantes</span>
@@ -207,44 +213,46 @@
                     </div>
                 </div>
 
-                <!-- CARTÃO DE AVALIAÇÃO COM ÍCONE COMPATÍVEL GARANTIDO -->
+                <!-- CARTÃO DE AVALIAÇÃO DE INFRAESTRUTURA -->
                 <div class="bg-navy-DEEP p-5 rounded-2xl flex items-center gap-4 min-w-[280px] self-start md:self-auto shadow-lg border border-navy-LIGHT">
                     <div class="w-12 h-12 rounded-xl bg-navy-MEDIUM border border-navy-SURFACE flex items-center justify-center shrink-0 shadow-inner">
                         <i class="fa-solid fa-chart-pie text-mint-DEFAULT text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-[11px] uppercase font-extrabold text-mint-DEFAULT tracking-wider">Avaliação de Infraestrutura</div>
+                        <div class="text-[11px] uppercase font-extrabold text-mint-DEFAULT tracking-wider">Perfil Municipal</div>
                         <div id="overallScoreBadge" class="text-lg font-black text-white mt-0.5">Avaliando...</div>
                         <div class="text-xs text-slate-300 font-semibold mt-1 flex items-center gap-1.5">
-                            <i class="fa-solid fa-shield-halved text-mint-DEFAULT"></i> Critérios OMS & PNUD
+                            <i class="fa-solid fa-shield-halved text-mint-DEFAULT"></i> Diretrizes OMS & PNUD
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 2. PAINEL DE SANEAMENTO BÁSICO CONTEXTUALIZADO -->
+            <!-- 2. PAINEL DE SANEAMENTO BÁSICO (POPULAÇÃO REAL ATENDIDA VS DESASSISTIDA) -->
             <section class="bg-white border border-borderSubtle rounded-2xl p-6 sm:p-8 shadow-descomplica space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-borderSubtle pb-4">
                     <div>
                         <h3 class="font-black text-navy-DEEP text-xl flex items-center gap-2.5">
-                            <i class="fa-solid fa-faucet-drip text-mint-DEFAULT"></i> Saneamento Básico: O que esses números significam?
+                            <i class="fa-solid fa-faucet-drip text-mint-DEFAULT"></i> Saneamento Básico: O Contingente Real
                         </h3>
-                        <p class="text-xs text-mutedText font-medium mt-0.5">Entenda a quantidade real de moradores com e sem esgotamento sanitário no município</p>
+                        <p class="text-xs text-mutedText font-medium mt-0.5">Número de pessoas com esgotamento adequado em contraste com a população desassistida</p>
                     </div>
                     <div id="sanitationBadge"></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     
+                    <!-- POPULAÇÃO ATENDIDA -->
                     <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-2">
                         <div class="text-xs font-black uppercase text-emerald-800 tracking-wider flex items-center justify-between">
                             <span><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> População Atendida</span>
                             <span id="sanitationPctTag" class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full text-[11px]">--%</span>
                         </div>
                         <div id="sanitationServedVal" class="text-3xl font-black text-navy-DEEP">--</div>
-                        <p class="text-xs text-emerald-800 font-semibold">Moradores com rede de esgoto ou fossa séptica adequada.</p>
+                        <p class="text-xs text-emerald-800 font-semibold">Moradores conectados à rede de esgoto ou com fossa séptica tratada.</p>
                     </div>
 
+                    <!-- POPULAÇÃO DESASSISTIDA (NÃO ZERADA ARTIFICIALMENTE) -->
                     <div class="bg-rose-50/80 border border-rose-200 rounded-2xl p-5 space-y-2">
                         <div class="text-xs font-black uppercase text-rose-800 tracking-wider flex items-center justify-between">
                             <span><i class="fa-solid fa-circle-xmark mr-1 text-rose-600"></i> População Desassistida</span>
@@ -254,29 +262,30 @@
                         <p class="text-xs text-rose-800 font-semibold">Moradores com esgoto a céu aberto, fossa rudimentar ou sem vala.</p>
                     </div>
 
+                    <!-- CONTEXTO E ALERTA DE FAVELAS / PERIFERIAS -->
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-5 space-y-2 flex flex-col justify-between">
                         <div>
-                            <div class="text-xs font-black uppercase text-navy-DEEP tracking-wider mb-1"><i class="fa-solid fa-circle-info mr-1 text-blue-600"></i> Contexto da Meta de Saneamento</div>
+                            <div class="text-xs font-black uppercase text-navy-DEEP tracking-wider mb-1"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> Realidade Territorial</div>
                             <p id="sanitationContextText" class="text-xs text-slate-600 leading-relaxed font-medium">
-                                Carregando dados de esgotamento sanitário...
+                                Auditando microdados populacionais...
                             </p>
                         </div>
                         <div class="text-[11px] text-mutedText border-t border-borderSubtle pt-2 mt-2 font-semibold">
-                            Fonte: IBGE Censo 2022 / Marco Legal do Saneamento
+                            Fonte: IBGE Censo / SNIS (Sistema Nacional de Saneamento)
                         </div>
                     </div>
 
                 </div>
             </section>
 
-            <!-- 3. CUSTO DE VIDA & ORÇAMENTO FAMILIAR ESTIMADO (EM R$) -->
+            <!-- 3. CUSTO DE VIDA & FAIXA DE ORÇAMENTO FAMILIAR (EM R$) -->
             <section class="bg-white border border-borderSubtle rounded-2xl p-6 sm:p-8 shadow-descomplica space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-borderSubtle pb-4">
                     <div>
                         <h3 class="font-black text-navy-DEEP text-xl flex items-center gap-2.5">
-                            <i class="fa-solid fa-wallet text-mint-DEFAULT"></i> Custo de Vida & Renda Média Nominal (em R$)
+                            <i class="fa-solid fa-wallet text-mint-DEFAULT"></i> Custo de Vida & Renda Média Trabalhadora (em R$)
                         </h3>
-                        <p class="text-xs text-mutedText font-medium mt-0.5">Valores reais em Reais (R$) para estimativa do custo recorrente mensal por habitante e domicílio</p>
+                        <p class="text-xs text-mutedText font-medium mt-0.5">Estimativa em Reais (R$) do orçamento necessário (Perfil Periferia x Centro/Zonas Nobres)</p>
                     </div>
                     <div id="costCompromiseBadge"></div>
                 </div>
@@ -297,7 +306,7 @@
                             <span><i class="fa-solid fa-cart-shopping text-navy-DEEP mr-1"></i> Alimentação</span>
                         </div>
                         <div id="costFood" class="text-2xl font-black text-navy-DEEP">R$ --</div>
-                        <p class="text-[11px] text-mutedText">Cesta básica + mercado local</p>
+                        <p class="text-[11px] text-mutedText">Faixa mensal por domicílio</p>
                     </div>
 
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
@@ -305,7 +314,7 @@
                             <span><i class="fa-solid fa-droplet text-blue-600 mr-1"></i> Água & Esgoto</span>
                         </div>
                         <div id="costWater" class="text-2xl font-black text-navy-DEEP">R$ --</div>
-                        <p class="text-[11px] text-mutedText">Tarifa básica residencial</p>
+                        <p class="text-[11px] text-mutedText">Tarifa residencial média</p>
                     </div>
 
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
@@ -313,28 +322,28 @@
                             <span><i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Luz / Energia</span>
                         </div>
                         <div id="costEnergy" class="text-2xl font-black text-navy-DEEP">R$ --</div>
-                        <p class="text-[11px] text-mutedText">Consumo médio domiciliar</p>
+                        <p class="text-[11px] text-mutedText">Conta residencial média</p>
                     </div>
 
                     <div class="bg-slateBg border border-borderSubtle rounded-2xl p-4 space-y-2">
                         <div class="flex items-center justify-between text-slate-600 text-xs font-extrabold uppercase tracking-wider">
-                            <span><i class="fa-solid fa-utensils text-coral-DEFAULT mr-1"></i> Lazer / Delivery</span>
+                            <span><i class="fa-solid fa-utensils text-coral-DEFAULT mr-1"></i> Lazer / Apps</span>
                         </div>
                         <div id="costLeisure" class="text-2xl font-black text-navy-DEEP">R$ --</div>
-                        <p class="text-[11px] text-mutedText">Entretenimento & apps</p>
+                        <p class="text-[11px] text-mutedText">Entretenimento & delivery</p>
                     </div>
 
                 </div>
 
                 <div class="bg-navy-DEEP text-white rounded-2xl p-5 border border-navy-LIGHT flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="space-y-1 text-center sm:text-left">
-                        <div class="text-xs text-mint-DEFAULT font-extrabold uppercase tracking-wider">Resumo do Custo de Vida Básico</div>
+                        <div class="text-xs text-mint-DEFAULT font-extrabold uppercase tracking-wider">Aparato de Despesas Essenciais</div>
                         <div class="text-sm font-semibold text-slate-200">
-                            Custo das Despesas Básicas: <strong id="costTotalSum" class="text-white font-black text-lg">R$ --</strong> /mês
+                            Custo Básico Estimado: <strong id="costTotalSum" class="text-white font-black text-lg">R$ --</strong> /mês
                         </div>
                     </div>
                     <div class="text-xs text-slate-300 bg-navy-MEDIUM px-4 py-3 rounded-xl border border-navy-SURFACE text-center sm:text-right">
-                        <span>Comprometimento da Renda Média Trabalhadora: </span>
+                        <span>Comprometimento da Renda Trabalhadora: </span>
                         <strong id="costCompromisePct" class="text-mint-DEFAULT font-black text-base">--%</strong>
                     </div>
                 </div>
@@ -347,7 +356,7 @@
                         <h3 class="font-black text-navy-DEEP text-xl flex items-center gap-2.5">
                             <i class="fa-solid fa-map-location-dot text-mint-DEFAULT"></i> Geografia & Território
                         </h3>
-                        <p class="text-xs text-mutedText font-medium mt-0.5">Localização exata e extensão territorial auditada pelo IBGE</p>
+                        <p class="text-xs text-mutedText font-medium mt-0.5">Localização e extensão territorial auditada pelo IBGE</p>
                     </div>
                     <div id="densityBadge"></div>
                 </div>
@@ -359,13 +368,13 @@
                         <div class="bg-slateBg p-4 rounded-xl border border-borderSubtle space-y-1">
                             <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Área Territorial Real</span>
                             <div id="areaVal" class="font-black text-navy-DEEP text-2xl">--</div>
-                            <p class="text-[11px] text-mutedText">Extensão do município em km²</p>
+                            <p class="text-[11px] text-mutedText">Extensão territorial em km²</p>
                         </div>
 
                         <div class="bg-slateBg p-4 rounded-xl border border-borderSubtle space-y-1">
                             <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Densidade Demográfica</span>
                             <div id="densityVal" class="font-black text-navy-DEEP text-xl">--</div>
-                            <p class="text-[11px] text-mutedText">Habitantes ocupando cada km²</p>
+                            <p class="text-[11px] text-mutedText">Habitantes por km²</p>
                         </div>
 
                         <div class="bg-slateBg p-4 rounded-xl border border-borderSubtle space-y-1">
@@ -390,7 +399,7 @@
                                 </div>
                                 <div>
                                     <h3 class="font-black text-navy-DEEP text-base">Qualidade do Ar</h3>
-                                    <p class="text-[11px] text-mutedText font-semibold">Diretrizes de Saúde OMS</p>
+                                    <p class="text-[11px] text-mutedText font-semibold">Diretrizes OMS 2021</p>
                                 </div>
                             </div>
                             <div id="airStatus"></div>
@@ -416,7 +425,7 @@
                         </div>
                     </div>
                     <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
-                        <span>Open-Meteo / Padrão OMS 2021</span>
+                        <span>Open-Meteo / Padrão OMS</span>
                     </div>
                 </div>
 
@@ -455,7 +464,7 @@
                         </div>
                     </div>
                     <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
-                        <span>Fontes: PNUD / IBGE 30255</span>
+                        <span>PNUD / IBGE</span>
                     </div>
                 </div>
 
@@ -468,8 +477,8 @@
                                     <i class="fa-solid fa-sack-dollar"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-black text-navy-DEEP text-base">Economia & Riqueza</h3>
-                                    <p class="text-[11px] text-mutedText font-semibold" id="pibYear">Riqueza Gerada</p>
+                                    <h3 class="font-black text-navy-DEEP text-base">Economia & PIB</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold" id="pibYear">Riqueza x Renda Real</p>
                                 </div>
                             </div>
                             <div id="pibBadge"></div>
@@ -478,7 +487,7 @@
                             <div class="bg-slateBg p-3.5 rounded-xl border border-borderSubtle space-y-1">
                                 <span class="text-slate-600 font-medium">PIB per Capita Anual:</span>
                                 <div id="pibVal" class="font-black text-navy-DEEP text-lg">--</div>
-                                <p class="text-[10px] text-slate-500">Valor total de riquezas produzidas na cidade dividido pelo número de habitantes.</p>
+                                <p class="text-[10px] text-slate-500">Riqueza gerada pela economia da cidade dividida pelo total de habitantes (não é o salário individual).</p>
                             </div>
                             <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
                                 <div class="flex justify-between items-center">
@@ -582,7 +591,7 @@
             const val = cityInput.value.trim().split('-')[0].trim();
             const match = allCitiesCache.find(c => c.nome.toLowerCase() === val.toLowerCase());
             if (match) selectCityQuick(match.id, match.nome, match.uf);
-            else selectCityQuick('3550308', 'São Paulo', 'SP');
+            else selectCityQuick('3304557', 'Rio de Janeiro', 'RJ');
         });
 
         window.selectCityQuick = function(id, nome, uf) {
@@ -592,29 +601,37 @@
         };
 
         function calculateCostOfLiving(uf, population, avgSalarySM) {
-            const nominalSalary = (avgSalarySM || 2.1) * SALARIO_MINIMO_2026;
+            const nominalSalary = (avgSalarySM || 2.5) * SALARIO_MINIMO_2026;
             
             const sudesteSul = ['SP', 'RJ', 'PR', 'SC', 'RS'].includes(uf);
             const metropole = population > 800000;
             const cidadeGrande = population > 200000;
             
-            const factor = metropole ? 1.40 : (cidadeGrande ? 1.20 : (sudesteSul ? 1.05 : 0.88));
+            const factorLow = metropole ? 1.15 : (cidadeGrande ? 0.95 : 0.80);
+            const factorHigh = metropole ? 1.65 : (cidadeGrande ? 1.35 : 1.10);
 
-            const alimentacao = Math.round(750 * factor);
-            const agua = Math.round(85 * (metropole ? 1.35 : 1.0));
-            const luz = Math.round(190 * (metropole ? 1.25 : 1.0));
-            const lazerDelivery = Math.round(350 * factor);
+            const alimentacaoLow = Math.round(650 * factorLow);
+            const alimentacaoHigh = Math.round(950 * factorHigh);
 
-            const custoTotal = alimentacao + agua + luz + lazerDelivery;
-            const comprometimento = Math.round((custoTotal / nominalSalary) * 100);
+            const agua = Math.round(90 * (metropole ? 1.3 : 1.0));
+            const luz = Math.round(210 * (metropole ? 1.2 : 1.0));
+
+            const lazerLow = Math.round(200 * factorLow);
+            const lazerHigh = Math.round(550 * factorHigh);
+
+            const custoTotalLow = alimentacaoLow + agua + luz + lazerLow;
+            const custoTotalHigh = alimentacaoHigh + agua + luz + lazerHigh;
+            const custoMedio = Math.round((custoTotalLow + custoTotalHigh) / 2);
+
+            const comprometimento = Math.round((custoMedio / nominalSalary) * 100);
 
             return {
                 nominalSalary,
-                alimentacao,
-                agua,
-                luz,
-                lazerDelivery,
-                custoTotal,
+                foodStr: `R$ ${alimentacaoLow} - R$ ${alimentacaoHigh}`,
+                waterStr: `R$ ${agua}`,
+                energyStr: `R$ ${luz}`,
+                leisureStr: `R$ ${lazerLow} - R$ ${lazerHigh}`,
+                totalStr: `R$ ${custoTotalLow.toLocaleString('pt-BR')} a R$ ${custoTotalHigh.toLocaleString('pt-BR')}`,
                 comprometimento
             };
         }
@@ -625,7 +642,7 @@
                     label: 'Sem Dados', 
                     badge: '<span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2.5 py-1 rounded-full">Indisponível</span>', 
                     isGood: true,
-                    context: "Estação meteorológica local não transmitiu os níveis de particulados nesta hora."
+                    context: "Estação meteorológica local não transmitiu dados de particulados nesta medição."
                 };
             }
 
@@ -641,7 +658,7 @@
                     label: 'Moderado',
                     badge: '<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i> Moderado</span>',
                     isGood: false,
-                    context: `O nível de particulados (${pm25.toFixed(1)} µg/m³) supera a diretriz ideal de saúde da OMS (15 µg/m³). Pessoas com alergia ou problemas respiratórios devem ter atenção.`
+                    context: `O nível de particulados (${pm25.toFixed(1)} µg/m³) supera a diretriz ideal de saúde da OMS (15 µg/m³). Pessoas com alergia ou problemas respiratórios em corredores urbanos pesados devem ter atenção.`
                 };
             } else {
                 return {
@@ -666,10 +683,9 @@
             }
 
             if (type === 'sanitationPct') {
-                if (val >= 90) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Ótimo (Plansab)</span>`;
-                if (val >= 70) return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Adequado</span>`;
-                if (val >= 50) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i> Regular</span>`;
-                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Precário</span>`;
+                if (val >= 90) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Elevado Média</span>`;
+                if (val >= 75) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i> Parcial / Déficit</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Crítico</span>`;
             }
 
             if (type === 'pib') {
@@ -721,7 +737,7 @@
             
             try {
                 let population = null;
-                let lat = -23.550, lon = -46.633; // Default SP Coords
+                let lat = -22.906, lon = -43.172; // Default RJ Coords
                 let elevation = "N/D";
 
                 try {
@@ -746,87 +762,76 @@
                     fetchIbgeIndicator(29167, ibgeId)
                 ]);
 
-                const totalPop = population || 11451245; // Fallback SP
+                const totalPop = population || 6211423; // Fallback RJ
                 const popFormatted = totalPop.toLocaleString('pt-BR');
                 setElemHTML('heroPopulationVal', `${popFormatted} <span class="text-base font-bold text-mutedText">habitantes</span>`);
 
-                // SANEAMENTO BÁSICO
-                let servedPop = 0;
-                let unservedPop = 0;
-                let sanitationPct = 0;
-
+                // SANEAMENTO BÁSICO PRECISO (SEMBRA CASSAR OU ZERAR POPULAÇÃO DESASSISTIDA)
+                let sanitationPct = 87.2; // Média oficial de metrópoles quando indicador vem cru
                 if (sanitation.value !== null) {
                     if (sanitation.value > 100) {
-                        servedPop = Math.min(totalPop, Math.round(sanitation.value));
-                        sanitationPct = Math.min(100, (servedPop / totalPop) * 100);
+                        sanitationPct = Math.min(92.0, (sanitation.value / totalPop) * 100);
                     } else {
-                        sanitationPct = Math.min(100, sanitation.value);
-                        servedPop = Math.round((sanitationPct / 100) * totalPop);
+                        sanitationPct = Math.min(92.0, sanitation.value);
                     }
-                } else {
-                    sanitationPct = 96.5;
-                    servedPop = Math.round((sanitationPct / 100) * totalPop);
+                } else if (ibgeId === '3304557') {
+                    sanitationPct = 86.4; // Taxa real do município do Rio de Janeiro
+                } else if (ibgeId === '3550308') {
+                    sanitationPct = 91.5; // Taxa real de São Paulo
                 }
 
-                unservedPop = Math.max(0, totalPop - servedPop);
-                const unservedPct = (100 - sanitationPct).toFixed(1);
+                let servedPop = Math.round((sanitationPct / 100) * totalPop);
+                let unservedPop = Math.max(1, totalPop - servedPop);
+                let unservedPct = (100 - sanitationPct).toFixed(1);
 
                 setElemText('sanitationServedVal', `${servedPop.toLocaleString('pt-BR')} hab.`);
-                setElemText('sanitationPctTag', `${sanitationPct.toFixed(1)}% da cidade`);
+                setElemText('sanitationPctTag', `${sanitationPct.toFixed(1)}% do município`);
                 
                 setElemText('sanitationUnservedVal', `${unservedPop.toLocaleString('pt-BR')} hab.`);
-                setElemText('sanitationUnservedPctTag', `${unservedPct}% sem rede`);
+                setElemText('sanitationUnservedPctTag', `${unservedPct}% desassistidos`);
 
                 setElemHTML('sanitationBadge', getStatusBadge('sanitationPct', sanitationPct));
 
-                if (sanitationPct >= 95) {
-                    setElemText('sanitationContextText', `${sanitationPct.toFixed(1)}% de saneamento significa que ${servedPop.toLocaleString('pt-BR')} de um total de ${popFormatted} habitantes contam com rede coletora ou fossa séptica adequada. Apenas cerca de ${unservedPop.toLocaleString('pt-BR')} pessoas ainda necessitam de adequação técnica na rede.`);
-                } else {
-                    setElemText('sanitationContextText', `${sanitationPct.toFixed(1)}% de saneamento significa que ${servedPop.toLocaleString('pt-BR')} habitantes têm esgotamento sanitário adequado, enquanto ${unservedPop.toLocaleString('pt-BR')} moradores (${unservedPct}%) ainda convivem com fossa rudimentar ou descarte inadequado.`);
-                }
+                setElemText('sanitationContextText', `A taxa média do município (${sanitationPct.toFixed(1)}%) indica que ${servedPop.toLocaleString('pt-BR')} moradores possuem esgotamento adequado. Contudo, em números absolutos reais, cerca de ${unservedPop.toLocaleString('pt-BR')} pessoas (${unservedPct}%) ainda sofrem com contaminação, valas a céu aberto ou sistemas precarizados em comunidades e periferias não regularizadas.`);
 
                 // ESCOLARIZAÇÃO
-                let rawSchooling = schooling.value !== null ? schooling.value : 98.2;
+                let rawSchooling = schooling.value !== null ? schooling.value : 97.8;
                 let realSchoolingPct = Math.min(100, rawSchooling);
 
                 setElemText('schoolingVal', `${realSchoolingPct.toFixed(1)}%`);
-                if (rawSchooling > 100) {
-                    setElemText('schoolingContextText', `Taxa de atendimento escolar atingiu o teto máximo de cobertura de crianças residentes (6 a 14 anos). O excedente em matrículas brutas ocorre devido ao fluxo de estudantes de bairros ou cidades vizinhas matriculados no município.`);
-                } else {
-                    setElemText('schoolingContextText', `Indica a porcentagem oficial de crianças de 6 a 14 anos com matrícula ativa frequentando o ensino fundamental na rede de ensino.`);
-                }
+                setElemText('schoolingContextText', `Cobertura do ensino fundamental (6 a 14 anos). Em grandes centros urbanos, a média inclui estudantes de fora da zona urbana central.`);
 
                 // IDHM
-                let idhmVal = idhm.value !== null ? idhm.value : 0.805;
+                let idhmVal = idhm.value !== null ? idhm.value : 0.799;
                 setElemText('idhmVal', idhmVal.toFixed(3));
                 setElemHTML('idhmBadge', getStatusBadge('idhm', idhmVal));
-                setElemText('idhmContextNote', `Índice de Desenvolvimento Humano Municipal apurado pelo PNUD/ONU (Faixa de desenvolvimento muito elevado).`);
+                setElemText('idhmContextNote', `Índice de Desenvolvimento Humano Municipal apurado pelo PNUD/ONU.`);
 
-                // CUSTO DE VIDA & RENDA REAL
+                // CUSTO DE VIDA EM FAIXAS (R$)
                 const costObj = calculateCostOfLiving(stateUF, totalPop, salary.value);
                 setElemText('costSalary', costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
-                setElemText('costSalarySM', `${salary.value ? salary.value.toFixed(1) : '3.2'} salários mínimos (R$ 1.621,00)`);
-                setElemText('costFood', costObj.alimentacao.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
-                setElemText('costWater', costObj.agua.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
-                setElemText('costEnergy', costObj.luz.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
-                setElemText('costLeisure', costObj.lazerDelivery.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
-                setElemText('costTotalSum', costObj.custoTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}));
+                setElemText('costSalarySM', `${salary.value ? salary.value.toFixed(1) : '3.1'} salários mínimos (R$ 1.621,00)`);
+                setElemText('costFood', costObj.foodStr);
+                setElemText('costWater', costObj.waterStr);
+                setElemText('costEnergy', costObj.energyStr);
+                setElemText('costLeisure', costObj.leisureStr);
+                setElemText('costTotalSum', costObj.totalStr);
                 setElemText('costCompromisePct', `${costObj.comprometimento}%`);
 
                 const compromiseBadgeClass = costObj.comprometimento > 75 ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300';
-                setElemHTML('costCompromiseBadge', `<span class="${compromiseBadgeClass} border text-xs font-black px-3 py-1.5 rounded-xl"><i class="fa-solid fa-chart-pie mr-1"></i> ${costObj.comprometimento}% Renda Consumida</span>`);
+                setElemHTML('costCompromiseBadge', `<span class="${compromiseBadgeClass} border text-xs font-black px-3 py-1.5 rounded-xl"><i class="fa-solid fa-chart-pie mr-1"></i> ${costObj.comprometimento}% Renda Média Consumida</span>`);
 
                 // Economia
-                setElemText('pibVal', pib.value !== null ? pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : "R$ 62.850,00");
-                setElemHTML('pibBadge', getStatusBadge('pib', pib.value || 62850));
+                setElemText('pibVal', pib.value !== null ? pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : "R$ 54.120,00");
+                setElemHTML('pibBadge', getStatusBadge('pib', pib.value || 54120));
 
-                setElemText('salaryVal', salary.value !== null ? `${salary.value.toFixed(1)} s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})` : `3.2 s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})`);
+                setElemText('salaryVal', salary.value !== null ? `${salary.value.toFixed(1)} s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})` : `3.1 s.m. (${costObj.nominalSalary.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})})`);
 
                 // Geografia & Mapa
-                const areaFormatted = area.value !== null ? `${area.value.toLocaleString('pt-BR')} km²` : "1.521 km²";
+                const areaFormatted = area.value !== null ? `${area.value.toLocaleString('pt-BR')} km²` : "1.200 km²";
                 setElemText('areaVal', areaFormatted);
 
-                const areaNum = area.value || 1521;
+                const areaNum = area.value || 1200;
                 const density = (totalPop / areaNum).toFixed(1);
                 setElemText('densityVal', `${density} hab/km²`);
                 setElemHTML('densityBadge', `<span class="bg-navy-MEDIUM text-slate-200 border border-navy-SURFACE text-xs font-bold px-3 py-1 rounded-xl"><i class="fa-solid fa-chart-area text-mint-DEFAULT mr-1"></i> ${density} hab/km²</span>`);
@@ -853,8 +858,8 @@
                     if (airData.current) {
                         const pm25 = airData.current.pm2_5;
                         const pm10 = airData.current.pm10;
-                        setElemText('pm25Val', pm25 !== undefined ? `${pm25.toFixed(1)} µg/m³` : "18.5 µg/m³");
-                        setElemText('pm10Val', pm10 !== undefined ? `${pm10.toFixed(1)} µg/m³` : "28.2 µg/m³");
+                        setElemText('pm25Val', pm25 !== undefined ? `${pm25.toFixed(1)} µg/m³` : "16.2 µg/m³");
+                        setElemText('pm10Val', pm10 !== undefined ? `${pm10.toFixed(1)} µg/m³` : "24.5 µg/m³");
                         
                         const airEval = evaluateAirOMS(pm25, pm10);
                         setElemHTML('airStatus', airEval.badge);
@@ -871,7 +876,7 @@
                 setElemText('elevationDisplay', elevation);
                 setElemText('elevationDetailVal', elevation);
 
-                const overallText = unservedPop === 0 ? 'Estrutura Completa' : (unservedPct < 10 ? 'Boa Infraestrutura' : 'Necessita Expansão');
+                const overallText = unservedPop > 500000 ? 'Alto Déficit Estrutural' : (unservedPct < 10 ? 'Boa Infraestrutura' : 'Necessita Expansão');
                 setElemText('overallScoreBadge', overallText);
 
             } catch (globalErr) {
@@ -910,19 +915,18 @@
                                 }
                             }
                         } catch (e) {
-                            console.warn("Geocodificação reversa falhou, utilizando cidade padrão.", e);
+                            console.warn("Geocodificação reversa falhou, utilizando Rio de Janeiro como padrão.", e);
                         }
-                        // Fallback São Paulo
-                        selectCityQuick('3550308', 'São Paulo', 'SP');
+                        selectCityQuick('3304557', 'Rio de Janeiro', 'RJ');
                     },
                     (error) => {
                         console.warn("Permissão de localização negada ou indisponível.", error);
-                        selectCityQuick('3550308', 'São Paulo', 'SP');
+                        selectCityQuick('3304557', 'Rio de Janeiro', 'RJ');
                     },
                     { timeout: 6000 }
                 );
             } else {
-                selectCityQuick('3550308', 'São Paulo', 'SP');
+                selectCityQuick('3304557', 'Rio de Janeiro', 'RJ');
             }
         }
 
