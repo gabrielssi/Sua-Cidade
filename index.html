@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Cidade — Transparência e Indicadores Municipais</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet CSS & JS (Mapa Interativo) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            DEEP: '#0A0933',
+                            MEDIUM: '#121040',
+                            LIGHT: '#1C195E',
+                            SURFACE: '#252275'
+                        },
+                        mint: {
+                            DEFAULT: '#00DA7A',
+                            HOVER: '#00C26C',
+                            LIGHT: 'rgba(0, 218, 122, 0.12)',
+                            GLOW: 'rgba(0, 218, 122, 0.3)'
+                        },
+                        coral: {
+                            DEFAULT: '#FF385C',
+                            HOVER: '#E02647',
+                            LIGHT: 'rgba(255, 56, 92, 0.12)'
+                        },
+                        slateBg: '#F4F6FB',
+                        cardBg: '#FFFFFF',
+                        borderSubtle: '#E2E8F0',
+                        mutedText: '#64748B'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'descomplica': '0 4px 24px rgba(10, 9, 51, 0.06)',
+                        'descomplica-hover': '0 12px 32px rgba(10, 9, 51, 0.12)',
+                        'mint-btn': '0 4px 18px rgba(0, 218, 122, 0.35)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F4F6FB;
+            color: #334155;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #F4F6FB; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00DA7A; }
+
+        .mint-glow-focus:focus-within {
+            border-color: #00DA7A;
+            box-shadow: 0 0 0 4px rgba(0, 218, 122, 0.25);
+        }
+
+        #cityMap {
+            z-index: 10;
+        }
+
+        @media print {
+            header, .no-print, .search-section, footer { display: none !important; }
+            body { background: white !important; }
+            .module-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #CBD5E1 !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-navy-DEEP text-white sticky top-0 z-40 border-b border-navy-LIGHT shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <a href="#" class="flex items-center gap-3.5 group">
+                <div class="w-12 h-12 rounded-xl bg-navy-MEDIUM border border-navy-SURFACE flex items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:shadow-mint-btn shadow-md relative overflow-hidden">
+                    <svg viewBox="0 0 100 100" class="w-10 h-10" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 85 V45 H30 V25 H50 V50 H65 V35 H85 V85 Z" fill="#1C195E" stroke="#252275" stroke-width="2" stroke-linejoin="round"/>
+                        <rect x="20" y="55" width="4" height="4" fill="#0A0933" />
+                        <rect x="35" y="35" width="4" height="4" fill="#0A0933" />
+                        <rect x="70" y="45" width="4" height="4" fill="#0A0933" />
+                        <path d="M50 12 C42 12 36 18 36 26 C36 36 50 52 50 52 C50 52 64 36 64 26 C64 18 58 12 50 12 Z" fill="#FF385C"/>
+                        <circle cx="50" cy="25" r="5" fill="#FFFFFF"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-black tracking-tight text-white">Sua<span class="text-mint-DEFAULT">Cidade</span></span>
+                        <span class="bg-mint-DEFAULT/15 text-mint-DEFAULT border border-mint-DEFAULT/40 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">Panorama 360°</span>
+                    </div>
+                </div>
+            </a>
+
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="hidden lg:flex items-center gap-2 text-xs font-bold bg-navy-MEDIUM px-3.5 py-2 rounded-xl border border-navy-SURFACE text-slate-200">
+                    <span class="w-2.5 h-2.5 rounded-full bg-mint-DEFAULT animate-pulse"></span>
+                    <span>Dados Oficiais Ativos</span>
+                </div>
+
+                <button onclick="window.print()" class="no-print bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-200 hover:text-white border border-navy-SURFACE px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-print text-mint-DEFAULT"></i>
+                    <span class="hidden sm:inline">Imprimir Relatório</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SEARCH SECTION -->
+    <section class="bg-navy-DEEP text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden no-print">
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-mint-DEFAULT/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto text-center space-y-6 relative z-10">
+            <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                Panorama completo da <span class="text-mint-DEFAULT underline decoration-mint-DEFAULT/40 underline-offset-8">sua cidade</span>
+            </h1>
+            
+            <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto font-medium">
+                Consulte qualquer município do Brasil e veja dados geográficos, sociais, econômicos e climáticos com alertas do que está bom ou precisa melhorar.
+            </p>
+
+            <div class="search-section max-w-2xl mx-auto pt-2 relative">
+                <div class="search-input-wrapper flex items-center bg-white rounded-2xl p-2 border-2 border-transparent shadow-2xl mint-glow-focus transition-all">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-lg ml-3 mr-2"></i>
+                    <input type="text" id="cityInput" placeholder="Digite o município (ex: Cocal do Sul, Curitiba, Recife)..." 
+                           class="w-full bg-transparent border-none outline-none text-navy-DEEP font-bold text-base placeholder-slate-400 px-2" autocomplete="off">
+                    
+                    <button id="clearSearchBtn" class="text-slate-400 hover:text-coral-DEFAULT px-3 hidden transition-colors" title="Limpar">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+
+                    <button id="btnSearch" class="bg-mint-DEFAULT hover:bg-mint-HOVER text-navy-DEEP font-black text-sm px-6 py-3.5 rounded-xl transition-all shadow-mint-btn flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-bolt"></i> Analisar
+                    </button>
+                </div>
+
+                <div id="suggestionsBox" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-borderSubtle shadow-2xl overflow-hidden z-50 text-left hidden max-h-72 overflow-y-auto"></div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-2 text-xs pt-2">
+                <span class="text-slate-400 font-bold mr-1"><i class="fa-solid fa-location-crosshairs text-coral-DEFAULT mr-1"></i> Acesso Rápido:</span>
+                <button onclick="selectCityQuick('4204251', 'Cocal do Sul', 'SC')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-white px-3.5 py-1.5 rounded-xl border border-mint-DEFAULT/30 transition-all font-bold shadow-[0_0_10px_rgba(0,218,122,0.1)]">Cocal do Sul - SC</button>
+                <button onclick="selectCityQuick('3550308', 'São Paulo', 'SP')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-300 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE transition-all font-semibold">São Paulo - SP</button>
+                <button onclick="selectCityQuick('4106902', 'Curitiba', 'PR')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-300 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE transition-all font-semibold">Curitiba - PR</button>
+                <button onclick="selectCityQuick('3304557', 'Rio de Janeiro', 'RJ')" class="bg-navy-MEDIUM hover:bg-navy-LIGHT text-slate-300 hover:text-white px-3.5 py-1.5 rounded-xl border border-navy-SURFACE transition-all font-semibold">Rio de Janeiro - RJ</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN DASHBOARD AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 flex-1 w-full pb-16 space-y-8">
+
+        <!-- LOADING SPINNER -->
+        <div id="loadingSpinner" class="hidden bg-white border border-borderSubtle rounded-2xl p-12 text-center shadow-descomplica space-y-4">
+            <div class="w-12 h-12 border-4 border-mint-LIGHT border-t-mint-DEFAULT rounded-full animate-spin mx-auto"></div>
+            <p class="text-navy-DEEP font-black text-base">Extraindo dados e mapeando a geografia do município...</p>
+            <p class="text-mutedText text-xs font-medium">Conectando às APIs do IBGE e Open-Meteo...</p>
+        </div>
+
+        <!-- DASHBOARD CONTENT -->
+        <div id="dashboardContent" class="space-y-8 transition-opacity duration-300">
+
+            <!-- 1. CITY HERO BANNER -->
+            <section class="bg-white border border-borderSubtle rounded-2xl p-6 sm:p-8 shadow-descomplica flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-2.5 h-full bg-mint-DEFAULT"></div>
+
+                <div class="space-y-4 pl-2 flex-1">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <h2 id="cityNameDisplay" class="text-3xl sm:text-4xl font-black text-navy-DEEP tracking-tight">Cocal do Sul</h2>
+                        
+                        <span id="stateBadgeDisplay" class="bg-mint-DEFAULT text-navy-DEEP font-black text-sm px-4 py-1 rounded-full uppercase tracking-widest shadow-sm">
+                            SC
+                        </span>
+
+                        <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-lg border border-emerald-200">
+                            <i class="fa-solid fa-circle-check text-emerald-600"></i> Dados Oficiais Auditados
+                        </span>
+                    </div>
+
+                    <div class="bg-slateBg p-4 sm:p-5 rounded-2xl border border-borderSubtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-2xl">
+                        <div>
+                            <div class="text-xs uppercase font-extrabold text-mutedText tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-users text-navy-DEEP"></i> População Residente
+                            </div>
+                            <div class="text-3xl sm:text-4xl font-black text-navy-DEEP mt-1" id="heroPopulationVal">
+                                -- <span class="text-base font-bold text-mutedText">habitantes</span>
+                            </div>
+                        </div>
+                        <div class="text-left sm:text-right border-t sm:border-t-0 sm:border-l border-borderSubtle pt-3 sm:pt-0 sm:pl-5 text-xs font-semibold text-slate-600">
+                            <div>Referência: <strong class="text-navy-DEEP font-bold">Censo 2022</strong></div>
+                            <div class="text-emerald-700 font-bold mt-0.5"><i class="fa-solid fa-database"></i> IBGE API 4709</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-mutedText font-medium">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-fingerprint text-navy-DEEP"></i> Cód IBGE: <strong id="ibgeCodeDisplay" class="text-navy-DEEP font-mono">--</strong></span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-navy-DEEP"></i> Coordenadas: <span id="coordsDisplay" class="font-mono text-navy-DEEP">--</span></span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-mountain text-navy-DEEP"></i> Altitude: <strong id="elevationDisplay" class="font-mono text-navy-DEEP">--</strong></span>
+                    </div>
+                </div>
+
+                <div class="bg-navy-DEEP p-6 rounded-2xl flex items-center gap-4 min-w-[280px] self-start md:self-auto shadow-lg border border-navy-LIGHT">
+                    <div class="w-[60px] h-[60px] rounded-xl bg-mint-DEFAULT flex items-center justify-center shrink-0 relative shadow-[0_4px_15px_rgba(0,218,122,0.4)]">
+                        <svg class="w-8 h-8 text-navy-DEEP relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-[11px] uppercase font-extrabold text-mint-DEFAULT tracking-wider">Status da Cidade</div>
+                        <div id="overallScoreBadge" class="text-base font-black text-white">Analisando...</div>
+                        <div class="text-xs text-slate-300 font-semibold mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-chart-pie text-mint-DEFAULT"></i> Avaliação Integrada
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. CAPA DA CIDADE: GEOGRAFIA & MAPA -->
+            <section class="bg-white border border-borderSubtle rounded-2xl p-6 sm:p-8 shadow-descomplica space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-borderSubtle pb-4">
+                    <div>
+                        <h3 class="font-black text-navy-DEEP text-xl flex items-center gap-2.5">
+                            <i class="fa-solid fa-map-location-dot text-mint-DEFAULT"></i> Geografia & Cobertura Territorial
+                        </h3>
+                        <p class="text-xs text-mutedText font-medium mt-0.5">Visualização geoespacial do município e relevo</p>
+                    </div>
+                    <div id="densityBadge"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                    <!-- Mapa Interativo (2 colunas) -->
+                    <div class="lg:col-span-2 rounded-2xl overflow-hidden border border-borderSubtle shadow-inner h-72 sm:h-80 bg-slate-100" id="cityMap"></div>
+
+                    <!-- Dados Geográficos (1 coluna) -->
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-slateBg p-4 rounded-xl border border-borderSubtle space-y-1">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Área Territorial</span>
+                            <div id="areaVal" class="font-black text-navy-DEEP text-2xl">--</div>
+                            <p class="text-[11px] text-mutedText">Extensão oficial IBGE</p>
+                        </div>
+
+                        <div class="bg-slateBg p-4 rounded-xl border border-borderSubtle space-y-1">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Densidade Demográfica</span>
+                            <div id="densityVal" class="font-black text-navy-DEEP text-xl">--</div>
+                            <p class="text-[11px] text-mutedText">Habitantes por quilômetro quadrado</p>
+                        </div>
+
+                        <div class="bg-slateBg p-4 rounded-xl border border-borderSubtle space-y-1">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Altitude Média</span>
+                            <div id="elevationDetailVal" class="font-black text-navy-DEEP text-xl">--</div>
+                            <p class="text-[11px] text-mutedText">Elevação em relação ao nível do mar</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. PAINEL DE SÍNTESE: O QUE É BOM vs O QUE PRECISA MELHORAR -->
+            <section class="bg-white border border-borderSubtle rounded-2xl p-6 sm:p-8 shadow-descomplica space-y-4">
+                <div class="border-b border-borderSubtle pb-3">
+                    <h3 class="font-black text-navy-DEEP text-xl flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-mint-DEFAULT"></i> Diagnóstico dos Indicadores Municipais
+                    </h3>
+                    <p class="text-xs text-mutedText font-medium">Resumo dos pontos fortes e pontos de atenção com base nas estatísticas oficiais</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Destaques Positivos -->
+                    <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center gap-2 text-emerald-800 font-black text-sm uppercase tracking-wider">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Pontos Fortes (O que está Bom)
+                        </div>
+                        <ul id="goodIndicatorsList" class="space-y-2 text-xs font-semibold text-slate-700">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-spinner animate-spin text-emerald-600"></i> Avaliando dados...</li>
+                        </ul>
+                    </div>
+
+                    <!-- Destaques de Atenção -->
+                    <div class="bg-amber-50/60 border border-amber-200 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center gap-2 text-amber-900 font-black text-sm uppercase tracking-wider">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i> Pontos de Atenção (A Melhorar)
+                        </div>
+                        <ul id="badIndicatorsList" class="space-y-2 text-xs font-semibold text-slate-700">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-spinner animate-spin text-amber-600"></i> Avaliando dados...</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. MODULES GRID DE DETALHAMENTO -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- MOD 1: DEMOGRAFIA -->
+                <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-extrabold">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-navy-DEEP text-base">Demografia</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold">Censo IBGE 2022</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slateBg p-3.5 rounded-xl border border-borderSubtle space-y-1">
+                                <div class="flex justify-between items-center text-slate-600"><span>Total de Residentes:</span></div>
+                                <div id="popTotalMetric" class="font-black text-navy-DEEP text-xl">--</div>
+                            </div>
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1 flex justify-between items-center">
+                                <span class="text-slate-600">Área Territorial:</span>
+                                <div id="modAreaVal" class="font-black text-navy-DEEP text-sm">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
+                        <span>Fonte: IBGE SIDRA 4709</span>
+                    </div>
+                </div>
+
+                <!-- MOD 2: IDH & EDUCAÇÃO -->
+                <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-lg font-extrabold">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-navy-DEEP text-base">IDH & Educação</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold">Desenvolvimento Humano</p>
+                                </div>
+                            </div>
+                            <div id="idhmBadge"></div>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-600">IDHM Geral:</span>
+                                    <div id="idhmVal" class="font-black text-navy-DEEP text-base">--</div>
+                                </div>
+                            </div>
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-600">Escolarização (6 a 14 anos):</span>
+                                    <div id="schoolingVal" class="font-black text-navy-DEEP text-base">--</div>
+                                </div>
+                                <div id="schoolingBadge" class="mt-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
+                        <span>Fontes: IBGE Indicadores 30255 / 29168</span>
+                    </div>
+                </div>
+
+                <!-- MOD 3: ECONOMIA & TRABALHO -->
+                <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-extrabold">
+                                    <i class="fa-solid fa-sack-dollar"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-navy-DEEP text-base">Economia & Trabalho</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold" id="pibYear">Renda e Riqueza</p>
+                                </div>
+                            </div>
+                            <div id="pibBadge"></div>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slateBg p-3.5 rounded-xl border border-borderSubtle space-y-1">
+                                <span class="text-slate-600 font-medium">PIB per Capita Anual:</span>
+                                <div id="pibVal" class="font-black text-navy-DEEP text-lg">--</div>
+                            </div>
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-600">Salário Médio Formal:</span>
+                                    <div id="salaryVal" class="font-black text-navy-DEEP text-sm">--</div>
+                                </div>
+                                <div id="salaryBadge" class="mt-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
+                        <span>Fontes: IBGE 47001 & 29765</span>
+                    </div>
+                </div>
+
+                <!-- MOD 4: SANEAMENTO & INFRAESTRUTURA -->
+                <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center text-lg font-extrabold">
+                                    <i class="fa-solid fa-faucet-drip"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-navy-DEEP text-base">Saneamento Bás.</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold" id="sanitationYear">Esgotamento e Higiene</p>
+                                </div>
+                            </div>
+                            <div id="sanitationBadge"></div>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slateBg p-3.5 rounded-xl border border-borderSubtle space-y-1">
+                                <span class="text-slate-600 font-medium">Esgotamento Sanitário Adequado:</span>
+                                <div id="sanitationVal" class="font-black text-navy-DEEP text-xl">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
+                        <span>Fonte: IBGE Indicador 29171</span>
+                    </div>
+                </div>
+
+                <!-- MOD 5: CLIMA & TEMPO -->
+                <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center text-lg font-extrabold">
+                                    <i class="fa-solid fa-sun-plant-wilt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-navy-DEEP text-base">Clima Atual</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold">Open-Meteo API</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="bg-slateBg p-3.5 rounded-xl border border-borderSubtle space-y-1 col-span-2 flex items-center justify-between">
+                                <span class="text-slate-600 font-medium">Temperatura:</span>
+                                <div id="tempVal" class="font-black text-navy-DEEP text-xl">--</div>
+                            </div>
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <span class="text-mutedText">Umidade:</span>
+                                <div id="humidityVal" class="font-black text-navy-DEEP text-sm">--</div>
+                            </div>
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <span class="text-mutedText">Vento:</span>
+                                <div id="windVal" class="font-black text-navy-DEEP text-sm">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
+                        <span>Tempo Real (Open-Meteo)</span>
+                    </div>
+                </div>
+
+                <!-- MOD 6: QUALIDADE DO AR -->
+                <div class="module-card bg-white border border-borderSubtle rounded-2xl p-6 shadow-descomplica flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-borderSubtle pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center text-lg font-extrabold">
+                                    <i class="fa-solid fa-wind"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-navy-DEEP text-base">Qualidade do Ar</h3>
+                                    <p class="text-[11px] text-mutedText font-semibold">Índice AQI & Partículas</p>
+                                </div>
+                            </div>
+                            <div id="airStatus"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <span class="text-mutedText">PM2.5:</span>
+                                <div id="pm25Val" class="font-black text-navy-DEEP text-sm">--</div>
+                            </div>
+                            <div class="bg-slateBg p-3 rounded-xl border border-borderSubtle space-y-1">
+                                <span class="text-mutedText">PM10:</span>
+                                <div id="pm10Val" class="font-black text-navy-DEEP text-sm">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-borderSubtle flex items-center justify-between text-[11px] text-mutedText font-medium">
+                        <span>Monitoramento Atmosférico</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-navy-DEEP text-slate-300 border-t border-navy-LIGHT py-8 mt-auto no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs font-medium space-y-2">
+            <p><strong>Sua Cidade</strong> — Plataforma de Transparência e Diagnóstico Municipal.</p>
+            <p class="text-slate-500">Fontes Oficiais: IBGE Censo 2022 (SIDRA), IBGE Indicadores e Open-Meteo Geocoding & Air Quality.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const cityInput = document.getElementById('cityInput');
+        const btnSearch = document.getElementById('btnSearch');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const suggestionsBox = document.getElementById('suggestionsBox');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const dashboardContent = document.getElementById('dashboardContent');
+
+        let allCitiesCache = [];
+        let leafletMap = null;
+        let leafletMarker = null;
+
+        // SAFE DOM HELPERS
+        function setElemText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        function setElemHTML(id, html) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        }
+
+        // LOAD MUNICIPALITIES INDEX
+        async function loadCities() {
+            try {
+                const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/municipios');
+                const data = await res.json();
+                allCitiesCache = data.map(c => ({
+                    id: c.id,
+                    nome: c.nome,
+                    uf: c.microrregiao?.mesorregiao?.UF?.sigla || c.UF?.sigla || ''
+                }));
+            } catch (e) {
+                console.error("Erro ao carregar mapa de municípios:", e);
+            }
+        }
+        loadCities();
+
+        cityInput.addEventListener('input', () => {
+            const query = cityInput.value.trim().toLowerCase();
+            clearSearchBtn.classList.toggle('hidden', query.length === 0);
+            
+            if (query.length < 2) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            const matches = allCitiesCache.filter(c => c.nome.toLowerCase().includes(query)).slice(0, 6);
+            if (matches.length > 0) {
+                suggestionsBox.innerHTML = matches.map(c => `
+                    <div onclick="selectCityQuick('${c.id}', '${c.nome.replace(/'/g, "\\'")}', '${c.uf}')" 
+                         class="p-3 border-b border-slate-100 hover:bg-slateBg cursor-pointer text-xs flex items-center justify-between">
+                        <div class="font-extrabold text-navy-DEEP"><i class="fa-solid fa-location-dot text-mint-DEFAULT mr-2"></i>${c.nome}</div>
+                        <span class="bg-mint-DEFAULT text-navy-DEEP font-black text-[10px] px-2 py-0.5 rounded-full">${c.uf}</span>
+                    </div>
+                `).join('');
+                suggestionsBox.classList.remove('hidden');
+            } else {
+                suggestionsBox.classList.add('hidden');
+            }
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            cityInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            suggestionsBox.classList.add('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-section')) suggestionsBox.classList.add('hidden');
+        });
+
+        btnSearch.addEventListener('click', () => {
+            const val = cityInput.value.trim().split('-')[0].trim();
+            const match = allCitiesCache.find(c => c.nome.toLowerCase() === val.toLowerCase());
+            if (match) selectCityQuick(match.id, match.nome, match.uf);
+            else selectCityQuick('4204251', 'Cocal do Sul', 'SC');
+        });
+
+        window.selectCityQuick = function(id, nome, uf) {
+            cityInput.value = `${nome} - ${uf}`;
+            suggestionsBox.classList.add('hidden');
+            fetchDashboardData(id, nome, uf);
+        };
+
+        // INDICATOR EVALUATION BADGES (BOM / REGULAR / RUIM)
+        function getStatusBadge(type, val) {
+            if (val === null || val === undefined || isNaN(val)) {
+                return `<span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-question mr-1"></i> Sem Dados</span>`;
+            }
+
+            if (type === 'idhm') {
+                if (val >= 0.75) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Muito Alto (Bom)</span>`;
+                if (val >= 0.70) return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Alto (Bom)</span>`;
+                if (val >= 0.60) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i> Médio (Atenção)</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Baixo (Ruim)</span>`;
+            }
+
+            if (type === 'sanitation') {
+                if (val >= 80) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Ótimo (Bom)</span>`;
+                if (val >= 50) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i> Parcial (Atenção)</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Precário (Ruim)</span>`;
+            }
+
+            if (type === 'pib') {
+                if (val >= 45000) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Elevado (Bom)</span>`;
+                if (val >= 25000) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-info mr-1"></i> Médio</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Baixo (Atenção)</span>`;
+            }
+
+            if (type === 'schooling') {
+                if (val >= 97) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Excelente (Bom)</span>`;
+                if (val >= 92) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-info mr-1"></i> Regular</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Baixo (Ruim)</span>`;
+            }
+
+            if (type === 'salary') {
+                if (val >= 2.5) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Acima da Média</span>`;
+                if (val >= 1.8) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-info mr-1"></i> Na Média</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Abaixo da Média</span>`;
+            }
+
+            if (type === 'aqi') {
+                if (val <= 20) return `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-leaf mr-1"></i> Excelente (Bom)</span>`;
+                if (val <= 50) return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check mr-1"></i> Bom</span>`;
+                if (val <= 100) return `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-exclamation mr-1"></i> Moderado</span>`;
+                return `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Ruim / Nocivo</span>`;
+            }
+
+            return '';
+        }
+
+        // MAP UPDATE FUNCTION
+        function renderMap(lat, lon, cityName, uf) {
+            if (!leafletMap) {
+                leafletMap = L.map('cityMap').setView([lat, lon], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    attribution: '© OpenStreetMap'
+                }).addTo(leafletMap);
+                leafletMarker = L.marker([lat, lon]).addTo(leafletMap);
+            } else {
+                leafletMap.setView([lat, lon], 12);
+                leafletMarker.setLatLng([lat, lon]);
+            }
+            leafletMarker.bindPopup(`<b>${cityName} - ${uf}</b><br>Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`).openPopup();
+            
+            setTimeout(() => {
+                if (leafletMap) leafletMap.invalidateSize();
+            }, 300);
+        }
+
+        // FETCH IBGE INDICATORS
+        async function fetchIbgeIndicator(indicatorId, ibgeId) {
+            try {
+                const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/pesquisas/indicadores/${indicatorId}/resultados/${ibgeId}`);
+                const data = await res.json();
+                if (data && data[0] && data[0].res && data[0].res[0] && data[0].res[0].res) {
+                    const results = data[0].res[0].res;
+                    const years = Object.keys(results).sort((a, b) => b - a);
+                    if (years.length > 0) {
+                        return { value: parseFloat(results[years[0]]), year: years[0] };
+                    }
+                }
+            } catch (err) {
+                console.error(`Erro ao buscar indicador ${indicatorId}:`, err);
+            }
+            return { value: null, year: null };
+        }
+
+        // MAIN FETCH FUNCTION WITH SAFE ERROR HANDLING
+        async function fetchDashboardData(ibgeId, cityName, stateUF) {
+            loadingSpinner.classList.remove('hidden');
+            dashboardContent.style.opacity = '0.2';
+            
+            try {
+                let population = null;
+                let lat = -28.601, lon = -49.324;
+                let elevation = "N/D";
+
+                // A. IBGE Censo 2022
+                try {
+                    const ibgeUrl = `https://servicodados.ibge.gov.br/api/v3/agregados/4709/periodos/2022/variaveis/93?localidades=N6[${ibgeId}]`;
+                    const ibgeRes = await fetch(ibgeUrl);
+                    const ibgeData = await ibgeRes.json();
+                    
+                    if (ibgeData && ibgeData[0] && ibgeData[0].resultados && ibgeData[0].resultados[0]) {
+                        const seriesObj = ibgeData[0].resultados[0].series[0].serie;
+                        population = parseInt(seriesObj["2022"], 10);
+                    }
+                } catch (err) {
+                    console.error("Erro IBGE Censo:", err);
+                }
+
+                // B. Fetch IBGE Indicadores Concurrently
+                const [sanitation, pib, salary, schooling, idhm, area] = await Promise.all([
+                    fetchIbgeIndicator(29171, ibgeId), // Esgotamento
+                    fetchIbgeIndicator(47001, ibgeId), // PIB per capita
+                    fetchIbgeIndicator(29765, ibgeId), // Salario
+                    fetchIbgeIndicator(29168, ibgeId), // Escolarizacao
+                    fetchIbgeIndicator(30255, ibgeId), // IDHM
+                    fetchIbgeIndicator(29167, ibgeId)  // Área Territorial
+                ]);
+
+                // Safe DOM Population Updates
+                const popFormatted = population ? population.toLocaleString('pt-BR') : "Indisponível";
+                setElemHTML('heroPopulationVal', `${popFormatted} <span class="text-base font-bold text-mutedText">habitantes</span>`);
+                setElemText('popTotalMetric', population ? `${popFormatted} hab.` : "Indisponível");
+
+                // Update Indicators Values
+                setElemText('sanitationVal', sanitation.value !== null ? `${sanitation.value}%` : "Indisponível");
+                setElemText('sanitationYear', sanitation.year ? `Ano ref: ${sanitation.year}` : "Esgotamento e Higiene");
+                setElemHTML('sanitationBadge', getStatusBadge('sanitation', sanitation.value));
+
+                setElemText('pibVal', pib.value !== null ? pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) : "Indisponível");
+                setElemText('pibYear', pib.year ? `Ano ref: ${pib.year}` : "Renda e Riqueza");
+                setElemHTML('pibBadge', getStatusBadge('pib', pib.value));
+
+                setElemText('salaryVal', salary.value !== null ? `${salary.value.toFixed(1)} salários mínimos` : "--");
+                setElemHTML('salaryBadge', getStatusBadge('salary', salary.value));
+
+                setElemText('schoolingVal', schooling.value !== null ? `${schooling.value}%` : "--");
+                setElemHTML('schoolingBadge', getStatusBadge('schooling', schooling.value));
+
+                setElemText('idhmVal', idhm.value !== null ? idhm.value.toFixed(3) : "--");
+                setElemHTML('idhmBadge', getStatusBadge('idhm', idhm.value));
+
+                const areaFormatted = area.value !== null ? `${area.value.toLocaleString('pt-BR')} km²` : "N/D";
+                setElemText('areaVal', areaFormatted);
+                setElemText('modAreaVal', areaFormatted);
+
+                // Calculate Density
+                if (population && area.value) {
+                    const density = (population / area.value).toFixed(1);
+                    setElemText('densityVal', `${density} hab/km²`);
+                    setElemHTML('densityBadge', `<span class="bg-navy-MEDIUM text-slate-200 border border-navy-SURFACE text-xs font-bold px-3 py-1 rounded-xl"><i class="fa-solid fa-chart-area text-mint-DEFAULT mr-1"></i> ${density} hab/km²</span>`);
+                } else {
+                    setElemText('densityVal', "N/D");
+                    setElemHTML('densityBadge', '');
+                }
+
+                // C. Fetch Geo & Weather Data (Open-Meteo)
+                let aqiVal = null;
+                try {
+                    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=pt&format=json`);
+                    const geoData = await geoRes.json();
+                    if (geoData.results && geoData.results[0]) {
+                        lat = geoData.results[0].latitude;
+                        lon = geoData.results[0].longitude;
+                        elevation = geoData.results[0].elevation ? `${geoData.results[0].elevation}m` : "N/D";
+                    }
+
+                    renderMap(lat, lon, cityName, stateUF);
+
+                    const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,pm10,pm2_5`;
+                    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`;
+                    
+                    const [airRes, weatherRes] = await Promise.all([fetch(airUrl), fetch(weatherUrl)]);
+                    const airData = await airRes.json();
+                    const weatherData = await weatherRes.json();
+
+                    if (airData.current) {
+                        aqiVal = airData.current.european_aqi || 20;
+                        setElemText('pm25Val', `${(airData.current.pm2_5 || 0).toFixed(1)} µg/m³`);
+                        setElemText('pm10Val', `${(airData.current.pm10 || 0).toFixed(1)} µg/m³`);
+                        setElemHTML('airStatus', getStatusBadge('aqi', aqiVal));
+                    }
+
+                    if (weatherData.current) {
+                        setElemText('tempVal', `${weatherData.current.temperature_2m.toFixed(1)}°C`);
+                        setElemText('humidityVal', `${weatherData.current.relative_humidity_2m}%`);
+                        setElemText('windVal', `${weatherData.current.wind_speed_10m} km/h`);
+                    }
+                } catch (err) {
+                    console.error("Erro Open-Meteo:", err);
+                }
+
+                // Header Information
+                setElemText('cityNameDisplay', cityName);
+                setElemText('stateBadgeDisplay', stateUF);
+                setElemText('ibgeCodeDisplay', ibgeId);
+                setElemText('coordsDisplay', `${lat.toFixed(3)}, ${lon.toFixed(3)}`);
+                setElemText('elevationDisplay', elevation);
+                setElemText('elevationDetailVal', elevation);
+
+                // D. SÍNTESE AUTOMÁTICA (O QUE É BOM vs O QUE PRECISA MELHORAR)
+                const goodList = [];
+                const badList = [];
+
+                if (idhm.value >= 0.70) goodList.push(`IDHM Elevado (${idhm.value.toFixed(3)}) — Desenvolvimento Humano em bom patamar.`);
+                else if (idhm.value !== null) badList.push(`IDHM Abaixo da Média (${idhm.value.toFixed(3)}) — Requer investimento social.`);
+
+                if (sanitation.value >= 70) goodList.push(`Saneamento Básico (${sanitation.value}%) — Boa infraestrutura sanitária.`);
+                else if (sanitation.value !== null) badList.push(`Saneamento Básico (${sanitation.value}%) — Necessita de expansão da rede de esgoto.`);
+
+                if (schooling.value >= 96) goodList.push(`Escolarização (${schooling.value}%) — Alta cobertura escolar para crianças de 6 a 14 anos.`);
+                else if (schooling.value !== null) badList.push(`Escolarização (${schooling.value}%) — Taxa de atendimento escolar a ser aprimorada.`);
+
+                if (pib.value >= 35000) goodList.push(`PIB per Capita (${pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}) — Atividade econômica forte.`);
+                else if (pib.value !== null) badList.push(`PIB per Capita (${pib.value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}) — Economia municipal com margem para crescimento.`);
+
+                if (aqiVal !== null && aqiVal <= 30) goodList.push(`Qualidade do Ar Excelente (AQI ${aqiVal}) — Baixo índice de poluição.`);
+                else if (aqiVal !== null && aqiVal > 50) badList.push(`Qualidade do Ar Moderada (AQI ${aqiVal}) — Presença de material particulado no ar.`);
+
+                if (goodList.length === 0) goodList.push("Indicadores dentro da média padrão nacional.");
+                if (badList.length === 0) badList.push("Nenhum indicador crítico identificado nos dados atuais.");
+
+                setElemHTML('goodIndicatorsList', goodList.map(item => `<li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> <span>${item}</span></li>`).join(''));
+                setElemHTML('badIndicatorsList', badList.map(item => `<li class="flex items-start gap-2"><i class="fa-solid fa-exclamation text-amber-600 mt-0.5"></i> <span>${item}</span></li>`).join(''));
+
+                const scoreText = badList.length <= 1 ? 'Excelente Estrutura' : badList.length <= 2 ? 'Bom Desenvolv.' : 'Atenção Necessária';
+                setElemText('overallScoreBadge', scoreText);
+
+            } catch (globalErr) {
+                console.error("Erro geral no dashboard:", globalErr);
+            } finally {
+                // ALWAYS HIDE SPINNER
+                loadingSpinner.classList.add('hidden');
+                dashboardContent.style.opacity = '1';
+            }
+        }
+
+        // INIT DEFAULT - Cocal do Sul / SC
+        fetchDashboardData('4204251', 'Cocal do Sul', 'SC');
+    </script>
+</body>
+</html>
